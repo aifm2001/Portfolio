@@ -13,7 +13,7 @@ async function get(url) {
   for (let attempt=0; attempt<3; attempt++) {
     try {
       const response = await fetch(url, {signal: AbortSignal.timeout(60000)});
-      if (!response.ok) throw new Error(response.status + ' ' + url);
+      if (!response.ok && !(response.status === 404 && url === SOURCE + '/404')) throw new Error(response.status + ' ' + url);
       return response;
     } catch(error) { if(attempt===2) throw error; }
   }
@@ -81,7 +81,7 @@ for(const [route,raw] of documents) {
   let html=replaceMedia(raw);
   for(const [url,file] of moduleNames) html=html.split(url).join(BASE+'/'+file);
   html=html.replace(/href="([^"]+)"/g,(whole,href)=>{
-    if(href.startsWith('#') || /^(mailto:|tel:|data:)/.test(href)) return whole;
+    if(href.startsWith(BASE+'/') || href===BASE || href.startsWith('#') || /^(mailto:|tel:|data:)/.test(href)) return whole;
     const target=new URL(href,SOURCE+route);
     if(target.origin!==SOURCE) return whole;
     return 'href="'+BASE+target.pathname+target.search+target.hash+'"';
