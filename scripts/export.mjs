@@ -74,6 +74,7 @@ for(const [url,raw] of modules) {
     return moduleNames.has(resolved)?quote+BASE+'/'+moduleNames.get(resolved)+quote:whole;
   });
   if(url===entry) code=code.replace(/path:\x60(\/[^\x60]*)\x60/g,(_,route)=>'path:\x60'+BASE+(route==='/'?'/':route)+'\x60');
+  code=code.replace(/EditorBar:[a-zA-Z_$][\w$]*===void 0\?void 0:/g,'EditorBar:!0?void 0:');
   code=code.replaceAll(SOURCE,DESTINATION).replace(/\/\/# sourceMappingURL=.*$/gm,'');
   await save(moduleNames.get(url),code);
 }
